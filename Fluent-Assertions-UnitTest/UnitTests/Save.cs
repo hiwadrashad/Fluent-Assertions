@@ -1,5 +1,6 @@
 ﻿using Fluent_Assertions_Library.DTOs;
 using Fluent_Assertions_Library.Interfaces;
+using FluentAssertions;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -14,13 +15,7 @@ namespace Fluent_Assertions_UnitTest.UnitTests
     {
         [Fact]
         public void Saving_DTO_Working_Check()
-        {
-            // |
-            // |  Does not work, should be working, look at this.
-            // V
-            //
-            // mockrepository.Verify( a => a.Save(new User { Emailadress = "test@gmail.com", Id = 1, LastName = "LastName", Name = "Name" }), Times.Once);
-
+        {           
             var mockrepository = new Mock<IUserRepository<User>>();
             mockrepository.Setup(a => a.Save(new User { Emailadress = "test@gmail.com", Id = 1, LastName = "LastName", Name = "Name" })).Verifiable();
         }
@@ -37,7 +32,7 @@ namespace Fluent_Assertions_UnitTest.UnitTests
             new Fluent_Assertions_Library.DTOs.User { Id = 4, Emailadress = "testx@hotmail.com", LastName = "lastname", Name = "Name" }
             });
 
-            Assert.Equal(4, mockrepository.Object.GetAll().Count());
+            mockrepository.Object.GetAll().Should().HaveCount(4);
         }
 
         [Theory]
@@ -54,15 +49,7 @@ namespace Fluent_Assertions_UnitTest.UnitTests
             new Fluent_Assertions_Library.DTOs.User { Id = 3, Emailadress = "testb@hotmail.com", LastName = "lastname", Name = "Name" },
             new Fluent_Assertions_Library.DTOs.User { Id = 4, Emailadress = "testx@hotmail.com", LastName = "lastname", Name = "Name" }
             }.OrderBy(a => a.Emailadress).ToList());
-
-            // |
-            // |   doesn't work 
-            // V
-
-            //mockrepository.Setup(a => a.OrderEmailAlphabetically());
-
-            Assert.Equal(mockrepository.Object.GetAll()[index].Emailadress, email);
-
+            mockrepository.Object.GetAll()[index].Emailadress.Should().Be(email);
 
         }
 
@@ -74,7 +61,7 @@ namespace Fluent_Assertions_UnitTest.UnitTests
             Action<User> SaveInputACT = (User user) => mockrepository.Object.Save(new User { });
             Func<List<User>> GetAllFUNC = () => mockrepository.Object.GetAll();
             var ex = Record.Exception(() => mockrepository.Object.SaveAndReturnAll(ref SaveInputACT, ref GetAllFUNC, (new User { Id = 1, Emailadress = "test@gmail.com", LastName = "Lastname", Name = "Name" })));
-            Assert.Null(ex);
+            ex.Should().BeNull();
         }
     }
 }
